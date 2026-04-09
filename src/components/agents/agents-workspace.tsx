@@ -20,6 +20,7 @@ import {
   Zap,
   Library,
   Save,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -526,6 +527,23 @@ export function AgentsWorkspace({
     }
   }
 
+  async function deleteConversation(id: string) {
+    try {
+      const response = await fetch(`/api/agents/conversations/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) return;
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      if (selectedConversationId === id) {
+        setSelectedConversationId(null);
+        setSelectedConversation(null);
+        setMode("composer");
+      }
+    } catch {
+      // Ignore transient failures.
+    }
+  }
+
   async function refreshLibrary() {
     const response = await fetch("/api/jobs/library");
     if (!response.ok) return;
@@ -867,6 +885,15 @@ export function AgentsWorkspace({
 
   function handleComposerInput(value: string, cursorPosition: number) {
     setComposerInput(value);
+
+    // Remove mentioned paths whose @Title no longer appears in the text
+    setMentionedPaths((current) =>
+      current.filter((path) => {
+        const title = makePageContextLabel(path, allPages);
+        return value.includes(`@${title}`);
+      })
+    );
+
     const textBefore = value.slice(0, cursorPosition);
     const atIndex = textBefore.lastIndexOf("@");
     if (atIndex === -1) {
@@ -1558,15 +1585,20 @@ export function AgentsWorkspace({
           {mentionedPaths.length > 0 ? (
             <div className="flex flex-wrap gap-2 px-4 pb-2">
               {mentionedPaths.map((path) => (
-                <button
+                <span
                   key={path}
-                  onClick={() =>
-                    setMentionedPaths((current) => current.filter((entry) => entry !== path))
-                  }
-                  className="rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground hover:text-foreground"
+                  className="group inline-flex items-center gap-0.5 rounded-full bg-muted px-2.5 py-1 text-[11px] text-muted-foreground"
                 >
                   @{makePageContextLabel(path, allPages)}
-                </button>
+                  <button
+                    onClick={() =>
+                      setMentionedPaths((current) => current.filter((entry) => entry !== path))
+                    }
+                    className="ml-0.5 inline-flex h-3.5 w-0 items-center justify-center overflow-hidden rounded-full opacity-0 transition-all duration-150 group-hover:w-3.5 group-hover:opacity-100 hover:bg-foreground/10"
+                  >
+                    <X className="h-2.5 w-2.5" />
+                  </button>
+                </span>
               ))}
             </div>
           ) : null}
@@ -1720,7 +1752,7 @@ export function AgentsWorkspace({
                       setMode("conversation");
                     }}
                     className={cn(
-                      "relative flex w-full items-start gap-2 border-b border-border/70 px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                      "group/conv relative flex w-full items-start gap-2 border-b border-border/70 px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                       isSelected ? "bg-primary/5" : "hover:bg-accent/35"
                     )}
                   >
@@ -1745,16 +1777,37 @@ export function AgentsWorkspace({
                         <p className="truncate text-[11.5px] font-medium leading-[1.35] text-foreground">
                           {conversation.title}
                         </p>
-                        <span
-                          aria-label={TRIGGER_LABELS[conversation.trigger]}
-                          title={TRIGGER_LABELS[conversation.trigger]}
-                          className={cn(
-                            "inline-flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full",
-                            TASK_CARD_TRIGGER_STYLES[conversation.trigger]
-                          )}
-                        >
-                          <TriggerIcon trigger={conversation.trigger} className="h-2.75 w-2.75" />
-                        </span>
+                        <div className="flex shrink-0 items-center gap-1">
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Delete conversation"
+                            title="Delete conversation"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              void deleteConversation(conversation.id);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.stopPropagation();
+                                void deleteConversation(conversation.id);
+                              }
+                            }}
+                            className="inline-flex h-5.5 w-5.5 items-center justify-center rounded-full text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover/conv:opacity-100"
+                          >
+                            <Trash2 className="h-2.75 w-2.75" />
+                          </span>
+                          <span
+                            aria-label={TRIGGER_LABELS[conversation.trigger]}
+                            title={TRIGGER_LABELS[conversation.trigger]}
+                            className={cn(
+                              "inline-flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full",
+                              TASK_CARD_TRIGGER_STYLES[conversation.trigger]
+                            )}
+                          >
+                            <TriggerIcon trigger={conversation.trigger} className="h-2.75 w-2.75" />
+                          </span>
+                        </div>
                       </div>
                       <div className="mt-0.5 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
                         <p className="truncate">{agent?.name || conversation.agentSlug}</p>
@@ -1835,6 +1888,15 @@ export function AgentsWorkspace({
                   >
                     <Settings className="h-3 w-3" />
                     Settings
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 gap-1 text-[11px] text-muted-foreground hover:text-destructive"
+                    onClick={() => void deleteConversation(selectedConversationMeta.id)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    Delete
                   </Button>
                 </div>
               </div>
