@@ -809,7 +809,7 @@ export function SettingsPage() {
                 </p>
                 <div className="space-y-2">
                   <a
-                    href="https://discord.gg/runcabinet"
+                    href="https://discord.gg/hJa5TRTbTH"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-[13px] font-medium hover:bg-primary/10 transition-colors"
