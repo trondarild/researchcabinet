@@ -64,6 +64,12 @@ export interface AgentListItem {
   runningCount?: number;
   status?: "active" | "running" | "idle";
 }
+export interface ProviderModel {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 export interface ProviderInfo {
   id: string;
   name: string;
@@ -76,6 +82,7 @@ export interface ProviderInfo {
   error?: string;
   installMessage?: string;
   installSteps?: Array<{ title: string; detail: string; link?: { label: string; url: string } }>;
+  models?: ProviderModel[];
   usage?: {
     agentSlugs: string[];
     jobs: Array<{

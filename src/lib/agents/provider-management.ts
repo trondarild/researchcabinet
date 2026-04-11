@@ -53,6 +53,7 @@ export class ProviderSettingsConflictError extends Error {
 
 export interface ProviderSettingsUpdateInput {
   defaultProvider?: string;
+  defaultModel?: string;
   disabledProviderIds?: string[];
   migrations?: ProviderMigration[];
 }
@@ -213,6 +214,7 @@ export async function updateProviderSettingsWithMigrations(
   const currentSettings = await readProviderSettings();
   const nextSettings = normalizeProviderSettings({
     defaultProvider: input.defaultProvider ?? currentSettings.defaultProvider,
+    defaultModel: input.defaultModel ?? currentSettings.defaultModel,
     disabledProviderIds: input.disabledProviderIds ?? currentSettings.disabledProviderIds,
   });
   const usage = await getProviderUsage();

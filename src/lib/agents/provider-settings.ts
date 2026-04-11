@@ -9,6 +9,7 @@ const PROVIDERS_FILE = path.join(CONFIG_DIR, "providers.json");
 
 export interface ProviderSettings {
   defaultProvider: string;
+  defaultModel?: string;
   disabledProviderIds: string[];
 }
 
@@ -37,8 +38,14 @@ export function normalizeProviderSettings(raw: unknown): ProviderSettings {
         ? fallbackDefault
         : enabledIds[0] || fallbackDefault;
 
+  const defaultModel =
+    typeof object.defaultModel === "string" && object.defaultModel.trim()
+      ? object.defaultModel.trim()
+      : undefined;
+
   return {
     defaultProvider,
+    defaultModel,
     disabledProviderIds,
   };
 }
