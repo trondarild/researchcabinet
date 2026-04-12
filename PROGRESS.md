@@ -1,5 +1,7 @@
 # Progress
 
+[2026-04-12] Redesigned "New Job" popup to match the "Edit Agent" dialog style exactly: two-column layout with the prompt textarea on the left (60vh tall, bg-muted/60 borderless), fields grid on the right (uppercase tracking labels, muted-fill inputs), and a proper footer with Starter Library ghost button on the left and Cancel + Create on the right.
+
 [2026-04-12] Fixed search API recursing into embedded app/website directories. `collectPages` in `src/app/api/search/route.ts` now skips directories that have `index.html` but no `index.md`, preventing internal files like `about.md` inside a pipeline app from appearing in Cmd+K search results.
 
 [2026-04-12] Created data/getting-started/ KB section with three pages: index (full file-type matrix + sidebar icon reference + keyboard shortcuts + features overview), apps-and-repos (embedded apps, full-screen .app mode, .repo.yaml spec), and symlinks-and-load-knowledge (Load Knowledge flow, .cabinet-meta, .repo.yaml, CABINET_DATA_DIR). Updated data/CLAUDE.md with a supported file types table covering all 13 types the tree-builder recognises. Updated data/index.md with a link to the new guide.

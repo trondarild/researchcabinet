@@ -2820,140 +2820,145 @@ export function AgentsWorkspace({
                   }
                   setNewJobDialogOpen(true);
                 }}>
-                  <DialogContent className="sm:max-w-3xl">
-                    <DialogHeader>
-                      <div className="flex items-center justify-between gap-3">
-                        <DialogTitle>New Job</DialogTitle>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 text-xs"
-                          onClick={() => setLibraryDialogOpen(true)}
-                        >
-                          Starter library
-                        </Button>
-                      </div>
+                  <DialogContent className="sm:max-w-5xl">
+                    <DialogHeader className="gap-1">
+                      <DialogTitle>New Job</DialogTitle>
+                      <DialogDescription>
+                        Configure a scheduled prompt that runs automatically on a cron schedule.
+                      </DialogDescription>
                     </DialogHeader>
                     {jobDraft ? (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-[11px] font-medium text-muted-foreground">Job name</label>
-                          <input
-                            value={jobDraft.name}
-                            onChange={(event) =>
-                              setJobDraft((current) =>
-                                current ? { ...current, name: event.target.value } : current
-                              )
-                            }
-                            className="mt-1 h-10 w-full rounded-lg border border-border bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
-                            placeholder="Weekly strategy digest"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[11px] font-medium text-muted-foreground">Job id</label>
-                          <input
-                            value={jobDraft.id}
-                            onChange={(event) =>
-                              setJobDraft((current) =>
-                                current ? { ...current, id: event.target.value } : current
-                              )
-                            }
-                            className="mt-1 h-10 w-full rounded-lg border border-border bg-background px-3 font-mono text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
-                            placeholder="weekly-strategy-digest"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[11px] font-medium text-muted-foreground">Schedule</label>
-                          <div className="mt-1">
-                            <SchedulePicker
-                              value={jobDraft.schedule || "0 9 * * 1-5"}
-                              onChange={(cron) =>
+                      <div className="space-y-3">
+                        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)]">
+                          <div className="space-y-1">
+                            <span className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+                              Prompt
+                            </span>
+                            <textarea
+                              value={jobDraft.prompt}
+                              onChange={(event) =>
                                 setJobDraft((current) =>
-                                  current ? { ...current, schedule: cron } : current
+                                  current ? { ...current, prompt: event.target.value } : current
                                 )
                               }
+                              className="h-[60vh] w-full resize-none rounded-lg bg-muted/60 px-3 py-2 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:bg-muted"
+                              placeholder="What should this job do?"
                             />
                           </div>
+                          <div className="grid content-start gap-2.5 sm:grid-cols-2">
+                            <label className="space-y-1 text-[10px] uppercase tracking-[0.08em] text-muted-foreground sm:col-span-2">
+                              <span>Job name</span>
+                              <input
+                                value={jobDraft.name}
+                                onChange={(event) =>
+                                  setJobDraft((current) =>
+                                    current ? { ...current, name: event.target.value } : current
+                                  )
+                                }
+                                className="w-full rounded-lg bg-muted/60 px-3 py-2 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:bg-muted"
+                                placeholder="Weekly strategy digest"
+                              />
+                            </label>
+                            <label className="space-y-1 text-[10px] uppercase tracking-[0.08em] text-muted-foreground sm:col-span-2">
+                              <span>Job id</span>
+                              <input
+                                value={jobDraft.id}
+                                onChange={(event) =>
+                                  setJobDraft((current) =>
+                                    current ? { ...current, id: event.target.value } : current
+                                  )
+                                }
+                                className="w-full rounded-lg bg-muted/60 px-3 py-2 font-mono text-[13px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:bg-muted"
+                                placeholder="weekly-strategy-digest"
+                              />
+                            </label>
+                            <div className="space-y-1 text-[10px] uppercase tracking-[0.08em] text-muted-foreground sm:col-span-2">
+                              <span>Schedule</span>
+                              <SchedulePicker
+                                value={jobDraft.schedule || "0 9 * * 1-5"}
+                                onChange={(cron) =>
+                                  setJobDraft((current) =>
+                                    current ? { ...current, schedule: cron } : current
+                                  )
+                                }
+                              />
+                            </div>
+                            <label className="space-y-1 text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+                              <span>Provider</span>
+                              <select
+                                value={jobDraft.provider}
+                                onChange={(event) =>
+                                  setJobDraft((current) =>
+                                    current ? { ...current, provider: event.target.value } : current
+                                  )
+                                }
+                                className="w-full rounded-lg bg-muted/60 px-3 py-2 text-[13px] text-foreground outline-none transition-colors focus:bg-muted"
+                              >
+                                {selectableCliProviders.map((provider) => (
+                                  <option key={provider.id} value={provider.id}>
+                                    {provider.name}{provider.available ? "" : " (not installed)"}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <label className="space-y-1 text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+                              <span>Timeout (s)</span>
+                              <input
+                                type="number"
+                                value={jobDraft.timeout || 600}
+                                onChange={(event) =>
+                                  setJobDraft((current) =>
+                                    current
+                                      ? { ...current, timeout: parseInt(event.target.value || "600", 10) }
+                                      : current
+                                  )
+                                }
+                                className="w-full rounded-lg bg-muted/60 px-3 py-2 text-[13px] text-foreground outline-none transition-colors focus:bg-muted"
+                              />
+                            </label>
+                            <label className="flex cursor-pointer items-center gap-2 text-[11px] text-muted-foreground sm:col-span-2">
+                              <input
+                                type="checkbox"
+                                checked={jobDraft.enabled}
+                                onChange={(event) =>
+                                  setJobDraft((current) =>
+                                    current ? { ...current, enabled: event.target.checked } : current
+                                  )
+                                }
+                              />
+                              <span>Enabled</span>
+                            </label>
+                          </div>
                         </div>
-                        <div>
-                          <label className="text-[11px] font-medium text-muted-foreground">Provider</label>
-                          <select
-                            value={jobDraft.provider}
-                            onChange={(event) =>
-                              setJobDraft((current) =>
-                                current ? { ...current, provider: event.target.value } : current
-                              )
-                            }
-                            className="mt-1 h-10 w-full rounded-lg border border-border bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
-                          >
-                            {selectableCliProviders.map((provider) => (
-                              <option key={provider.id} value={provider.id}>
-                                {provider.name}{provider.available ? "" : " (not installed)"}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="text-[11px] font-medium text-muted-foreground">Timeout (seconds)</label>
-                          <input
-                            type="number"
-                            value={jobDraft.timeout || 600}
-                            onChange={(event) =>
-                              setJobDraft((current) =>
-                                current
-                                  ? {
-                                      ...current,
-                                      timeout: parseInt(event.target.value || "600", 10),
-                                    }
-                                  : current
-                              )
-                            }
-                            className="mt-1 h-10 w-full rounded-lg border border-border bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[11px] font-medium text-muted-foreground">Prompt</label>
-                          <textarea
-                            value={jobDraft.prompt}
-                            onChange={(event) =>
-                              setJobDraft((current) =>
-                                current ? { ...current, prompt: event.target.value } : current
-                              )
-                            }
-                            rows={12}
-                            className="mt-1 w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-1 focus:ring-ring"
-                            placeholder="What should this job do?"
-                          />
-                        </div>
-                        <label className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                          <input
-                            type="checkbox"
-                            checked={jobDraft.enabled}
-                            onChange={(event) =>
-                              setJobDraft((current) =>
-                                current ? { ...current, enabled: event.target.checked } : current
-                              )
-                            }
-                          />
-                          Enabled
-                        </label>
-                        <div className="flex justify-end gap-2 border-t border-border pt-3">
-                          <Button variant="outline" size="sm" className="h-9 px-4" onClick={closeNewJobDialog}>
-                            Cancel
-                          </Button>
+                        <div className="flex items-center justify-between border-t border-border pt-3">
                           <Button
+                            variant="ghost"
                             size="sm"
-                            className="h-9 px-4"
-                            onClick={() => void saveJob()}
-                            disabled={
-                              savingJob ||
-                              !jobDraft.name.trim() ||
-                              !jobDraft.id.trim() ||
-                              !jobDraft.prompt.trim()
-                            }
+                            className="h-8 gap-1 text-xs"
+                            onClick={() => setLibraryDialogOpen(true)}
                           >
-                            {savingJob ? "Saving..." : "Create job"}
+                            <Library className="h-3.5 w-3.5" />
+                            Starter library
                           </Button>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={closeNewJobDialog}>
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="h-8 gap-1 text-xs"
+                              onClick={() => void saveJob()}
+                              disabled={
+                                savingJob ||
+                                !jobDraft.name.trim() ||
+                                !jobDraft.id.trim() ||
+                                !jobDraft.prompt.trim()
+                              }
+                            >
+                              <Save className="h-3.5 w-3.5" />
+                              {savingJob ? "Saving..." : "Create job"}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ) : null}
