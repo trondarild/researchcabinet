@@ -748,7 +748,7 @@ function BoardLane({
   lane: BoardLane;
   count: number;
   headerAction?: ReactNode;
-  emptyState: string;
+  emptyState: ReactNode;
   children: ReactNode;
 }) {
   const copy = LANE_COPY[lane];
@@ -1727,7 +1727,20 @@ export function TasksBoard({
               <BoardLane
                 lane="inbox"
                 count={drafts.length}
-                emptyState="No inbox tasks yet. Click Add to queue the next thing you want to execute."
+                emptyState={
+                  <div className="flex flex-col items-start gap-3">
+                    <span>No inbox tasks yet.</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2.5 text-[11px]"
+                      onClick={() => setCreateDialogOpen(true)}
+                    >
+                      <Plus data-icon="inline-start" />
+                      Add task
+                    </Button>
+                  </div>
+                }
                 headerAction={
                   <Button
                     variant="ghost"

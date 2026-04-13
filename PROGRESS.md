@@ -1,5 +1,7 @@
 # Progress
 
+[2026-04-13] Task board inbox empty state now shows an "Add task" button instead of instructing users to click the header Add button.
+
 [2026-04-13] Sidebar "New Page" and "New Cabinet" buttons now use text-xs, tighter gap/padding, and whitespace-nowrap to keep labels on a single line.
 
 [2026-04-13] Constrain Jobs & heartbeats calendar to 600px height with a scrollbar. MonthView grid is now scrollable within a flex-1 overflow-y-auto wrapper; the section no longer grows to full content height.
