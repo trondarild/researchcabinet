@@ -103,20 +103,34 @@ function NewCabinetOverlay({
     >
       <div className="relative w-full max-w-5xl mx-4 my-8 bg-card rounded-2xl border border-border shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-8 pt-8 pb-4">
+        <div className="flex items-start justify-between px-8 pt-8 pb-4">
           <div>
             <h2 className="text-xl font-semibold text-foreground">Create New Cabinet</h2>
             <p className="text-sm text-muted-foreground mt-1">
               A cabinet is a workspace with its own agents, jobs, and knowledge.
             </p>
           </div>
-          <button
-            onClick={() => !creating && onOpenChange(false)}
-            disabled={creating}
-            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2 ml-4 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                onOpenChange(false);
+                setSection({ type: "registry" });
+              }}
+              disabled={creating}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+            >
+              <LayoutTemplate className="h-3.5 w-3.5" />
+              Import from Registry
+            </button>
+            <button
+              onClick={() => !creating && onOpenChange(false)}
+              disabled={creating}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleCreate} className="px-8 pb-8 space-y-6">
@@ -153,37 +167,6 @@ function NewCabinetOverlay({
           {error && (
             <p className="text-sm text-destructive">{error}</p>
           )}
-
-          {/* Import option */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-card px-3 text-xs text-muted-foreground">or</span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              onOpenChange(false);
-              setSection({ type: "registry" });
-            }}
-            disabled={creating}
-            className="group flex w-full items-center gap-4 rounded-xl border border-border bg-muted/30 px-5 py-4 text-left transition-colors hover:bg-muted/60 hover:border-primary/30 disabled:opacity-50"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-background group-hover:border-primary/30 transition-colors">
-              <LayoutTemplate className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">Import a pre-made cabinet</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Browse ready-to-use teams from the registry
-              </p>
-            </div>
-            <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors">→</span>
-          </button>
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-3 pt-2 border-t border-border">

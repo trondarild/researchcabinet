@@ -228,3 +228,5 @@
 [2026-04-13] Fix split button separation: wrap main+chevron in a shared flex container so they render as one joined control.
 
 [2026-04-13] New Cabinet dialog: replace tiny "import a pre-made team →" text link with a full-width card button featuring icon, title, description, and arrow — separated from the create form by an "or" divider.
+
+[2026-04-13] New Cabinet dialog: move "Import from Registry" to header top-right as a compact button next to close; remove bottom card + or-divider that made dialog too tall.
