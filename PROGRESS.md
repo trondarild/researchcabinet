@@ -222,3 +222,5 @@
 [2026-04-13] White and Black themes now explicitly set font to var(--font-sans) so they use Inter rather than the browser default when data-custom-theme is active. Also optimized registry template download to use a single recursive git tree API call instead of recursive per-directory listing.
 
 [2026-04-13] Cabinet scheduler controls: replace alarming red/green split-button with neutral muted styling; add pulsing green "Live" indicator when agents are active; unify button sizing (same height, icon size, padding).
+
+[2026-04-13] Fix split button separation: wrap main+chevron in a shared flex container so they render as one joined control.

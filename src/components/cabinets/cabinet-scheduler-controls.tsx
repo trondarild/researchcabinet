@@ -88,37 +88,39 @@ export function CabinetSchedulerControls({
         </span>
       )}
 
-      {/* Main toggle button */}
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => void schedulerAction(anyActive ? "stop-all" : "start-all")}
-        title={
-          anyActive
-            ? `Stop all ${activeOwn.length} active agent(s) — pauses their heartbeats and cron jobs. Only this cabinet, not sub-cabinets.`
-            : `Activate all ${ownAgents.length} agent(s) — starts their heartbeats and cron jobs on schedule. Only this cabinet, not sub-cabinets.`
-        }
-        className={cn(splitBase, "gap-2 rounded-l-md border-r-0 px-3 py-1.5 text-sm font-medium")}
-      >
-        {busy ? (
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        ) : anyActive ? (
-          <Square className="h-3.5 w-3.5" />
-        ) : (
-          <Play className="h-3.5 w-3.5" />
-        )}
-        {anyActive ? "Stop All" : "Start All"}
-      </button>
+      {/* Split button group */}
+      <div className="flex items-stretch">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void schedulerAction(anyActive ? "stop-all" : "start-all")}
+          title={
+            anyActive
+              ? `Stop all ${activeOwn.length} active agent(s) — pauses their heartbeats and cron jobs. Only this cabinet, not sub-cabinets.`
+              : `Activate all ${ownAgents.length} agent(s) — starts their heartbeats and cron jobs on schedule. Only this cabinet, not sub-cabinets.`
+          }
+          className={cn(splitBase, "gap-2 rounded-l-md border-r-0 px-3 py-1.5 text-sm font-medium")}
+        >
+          {busy ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : anyActive ? (
+            <Square className="h-3.5 w-3.5" />
+          ) : (
+            <Play className="h-3.5 w-3.5" />
+          )}
+          {anyActive ? "Stop All" : "Start All"}
+        </button>
 
-      {/* Dropdown toggle */}
-      <button
-        type="button"
-        disabled={busy}
-        onClick={() => setMenuOpen((o) => !o)}
-        className={cn(splitBase, "rounded-r-md px-2 py-1.5")}
-      >
-        <ChevronDown className="h-3.5 w-3.5" />
-      </button>
+        {/* Dropdown toggle */}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => setMenuOpen((o) => !o)}
+          className={cn(splitBase, "rounded-r-md border-l border-border/60 px-2 py-1.5")}
+        >
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
+      </div>
 
       {/* Dropdown menu */}
       {menuOpen ? (
