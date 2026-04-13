@@ -3136,99 +3136,128 @@ export function AgentsWorkspace({
                   </DialogContent>
                 </Dialog>
 
-                <div className="min-h-0 flex-1 overflow-hidden">
-                  <div className="flex h-full min-h-0">
-                    <div className="flex min-h-0 w-full flex-col overflow-hidden rounded-xl border border-border">
-                      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-                        <div>
-                          <h4
-                            className="text-[13px] font-semibold"
-                            title="Per-agent recurring prompts"
-                          >
-                            Jobs
-                          </h4>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 gap-1 text-xs"
-                          onClick={startNewJobDraft}
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                          New job
-                        </Button>
-                      </div>
-                      <ScrollArea className="min-h-0 flex-1">
-                        <div className="p-1">
-                          {settingsJobs.length === 0 ? (
-                            <div className="px-3 py-6 text-[12px] text-muted-foreground">
-                              No jobs yet. Start from scratch or use a library template.
-                            </div>
-                          ) : (
-                            settingsJobs.map((job) => (
-                              <div
-                                key={job.id}
-                                className="flex items-center gap-3 rounded-lg border-b border-border/50 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-accent/20"
-                              >
-                                <button
-                                  onClick={() => openJob(job.id)}
-                                  className="min-w-0 flex-1 text-left"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span
-                                      className={cn(
-                                        "h-1.5 w-1.5 rounded-full",
-                                        job.enabled ? "bg-green-500" : "bg-muted-foreground/30"
-                                      )}
-                                    />
-                                    <span className="truncate text-[12px] font-medium">{job.name}</span>
-                                    <span className="text-[10px] text-muted-foreground">·</span>
-                                    <span className="text-[11px] text-muted-foreground">{cronToHuman(job.schedule)}</span>
-                                  </div>
-                                </button>
-                                  <div className="flex items-center gap-1">
-                                    <button
-                                      onClick={() => void runJob(job.id)}
-                                      disabled={runningJobId === job.id}
-                                      className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-primary"
-                                      title="Run now"
-                                    >
-                                      {runningJobId === job.id ? (
-                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                      ) : (
-                                        <Zap className="h-3.5 w-3.5" />
-                                      )}
-                                    </button>
-                                    <button
-                                      onClick={() => void toggleJob(job)}
-                                      className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-                                      title={job.enabled ? "Pause" : "Enable"}
-                                    >
-                                      {job.enabled ? (
-                                        <Pause className="h-3.5 w-3.5" />
-                                      ) : (
-                                        <Play className="h-3.5 w-3.5" />
-                                      )}
-                                    </button>
-                                    <button
-                                      onClick={() => void deleteJob(job.id)}
-                                      disabled={deletingJobId === job.id}
-                                      className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-destructive"
-                                      title="Delete"
-                                    >
-                                      {deletingJobId === job.id ? (
-                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                      )}
-                                    </button>
-                                  </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </ScrollArea>
+                <div className="grid min-h-0 flex-1 grid-cols-[1fr_300px] gap-3 overflow-hidden">
+                  {/* Left: Instructions (read-only, scrollable) */}
+                  <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border">
+                    <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                      <h4 className="text-[13px] font-semibold">Instructions</h4>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1 text-xs"
+                        onClick={() => handleSettingsEditorOpenChange(true)}
+                      >
+                        <Settings className="h-3.5 w-3.5" />
+                        Edit
+                      </Button>
                     </div>
+                    <ScrollArea className="min-h-0 flex-1">
+                      <div className="px-4 py-3">
+                        {settingsBodyHtml ? (
+                          <div
+                            className="prose prose-sm prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-h1:text-base prose-h2:text-[13px] prose-h3:text-[12px] prose-p:text-[12px] prose-p:text-foreground/85 prose-li:text-[12px] prose-li:text-foreground/85 prose-a:text-foreground prose-code:text-[11px] prose-code:text-foreground prose-code:bg-muted prose-code:px-1 prose-code:rounded prose-pre:bg-muted prose-pre:border-0 prose-pre:text-foreground prose-strong:text-foreground"
+                            dangerouslySetInnerHTML={{ __html: settingsBodyHtml }}
+                          />
+                        ) : settingsBody.trim() ? (
+                          <pre className="whitespace-pre-wrap text-[12px] leading-relaxed text-foreground">
+                            {settingsBody}
+                          </pre>
+                        ) : (
+                          <div className="text-[12px] text-muted-foreground">
+                            No instructions yet. Click Edit to add them.
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+
+                  {/* Right: Jobs */}
+                  <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-border">
+                    <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                      <h4 className="text-[13px] font-semibold" title="Per-agent recurring prompts">
+                        Jobs
+                      </h4>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1 text-xs"
+                        onClick={startNewJobDraft}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        New job
+                      </Button>
+                    </div>
+                    <ScrollArea className="min-h-0 flex-1">
+                      <div className="p-1">
+                        {settingsJobs.length === 0 ? (
+                          <div className="px-3 py-6 text-[12px] text-muted-foreground">
+                            No jobs yet. Start from scratch or use a library template.
+                          </div>
+                        ) : (
+                          settingsJobs.map((job) => (
+                            <div
+                              key={job.id}
+                              className="flex items-center gap-3 rounded-lg border-b border-border/50 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-accent/20"
+                            >
+                              <button
+                                onClick={() => openJob(job.id)}
+                                className="min-w-0 flex-1 text-left"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={cn(
+                                      "h-1.5 w-1.5 shrink-0 rounded-full",
+                                      job.enabled ? "bg-green-500" : "bg-muted-foreground/30"
+                                    )}
+                                  />
+                                  <span className="truncate text-[12px] font-medium">{job.name}</span>
+                                </div>
+                                <div className="mt-0.5 pl-3.5 text-[11px] text-muted-foreground">
+                                  {cronToHuman(job.schedule)}
+                                </div>
+                              </button>
+                              <div className="flex shrink-0 items-center gap-1">
+                                <button
+                                  onClick={() => void runJob(job.id)}
+                                  disabled={runningJobId === job.id}
+                                  className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-primary"
+                                  title="Run now"
+                                >
+                                  {runningJobId === job.id ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  ) : (
+                                    <Zap className="h-3.5 w-3.5" />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => void toggleJob(job)}
+                                  className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                                  title={job.enabled ? "Pause" : "Enable"}
+                                >
+                                  {job.enabled ? (
+                                    <Pause className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <Play className="h-3.5 w-3.5" />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => void deleteJob(job.id)}
+                                  disabled={deletingJobId === job.id}
+                                  className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-destructive"
+                                  title="Delete"
+                                >
+                                  {deletingJobId === job.id ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </ScrollArea>
                   </div>
                 </div>
 
