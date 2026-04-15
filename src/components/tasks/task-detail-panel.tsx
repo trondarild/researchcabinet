@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { BrainCircuit, X } from "lucide-react";
 import { useAppStore } from "@/stores/app-store";
 import { ConversationSessionView } from "@/components/agents/conversation-session-view";
 import { Button } from "@/components/ui/button";
-import type { ConversationDetail, ConversationStatus } from "@/types/conversations";
+import type {
+  ConversationDetail,
+  ConversationMeta,
+  ConversationStatus,
+} from "@/types/conversations";
 import { openArtifactPath } from "@/lib/navigation/open-artifact-path";
 
 function StatusDot({ status }: { status: ConversationStatus }) {
@@ -39,6 +43,39 @@ function startCase(value: string | undefined, fallback = "General"): string {
   return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 }
 
+function readConversationModel(meta: Pick<ConversationMeta, "adapterConfig">): string | null {
+  const config = meta.adapterConfig;
+  if (!config || typeof config !== "object") return null;
+  const model = config.model;
+  return typeof model === "string" && model.trim() ? model.trim() : null;
+}
+
+function formatProviderLabel(providerId?: string): string | null {
+  if (!providerId) return null;
+
+  return providerId
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((segment) => {
+      const upper = segment.toUpperCase();
+      if (upper === "API" || upper === "CLI") return upper;
+      return segment.charAt(0).toUpperCase() + segment.slice(1);
+    })
+    .join(" ");
+}
+
+function buildRuntimeLabel(
+  meta: Pick<ConversationMeta, "adapterConfig" | "providerId">
+): string | null {
+  const model = readConversationModel(meta);
+  const provider = formatProviderLabel(meta.providerId);
+
+  if (model && provider) return `${model} · ${provider}`;
+  if (model) return model;
+  if (provider) return `${provider} · default model`;
+  return null;
+}
+
 export function TaskDetailPanel() {
   const conversation = useAppStore((s) => s.taskPanelConversation);
   const setTaskPanelConversation = useAppStore((s) => s.setTaskPanelConversation);
@@ -46,6 +83,7 @@ export function TaskDetailPanel() {
 
   if (!conversation) return null;
   const activeConversation = detail?.meta.id === conversation.id ? detail.meta : conversation;
+  const runtimeLabel = buildRuntimeLabel(activeConversation);
 
   return (
     <div className="flex h-full w-[420px] shrink-0 flex-col border-l border-border/70 bg-background">
@@ -62,6 +100,12 @@ export function TaskDetailPanel() {
             {" · "}
             {formatRelative(activeConversation.startedAt)}
           </p>
+          {runtimeLabel ? (
+            <div className="mt-1 flex items-center gap-1.5 pl-4 text-[11px] text-muted-foreground">
+              <BrainCircuit className="size-3.5 shrink-0" />
+              <p className="truncate">{runtimeLabel}</p>
+            </div>
+          ) : null}
         </div>
         <Button
           variant="ghost"
