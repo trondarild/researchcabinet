@@ -2,7 +2,7 @@
 
 ## What is this project?
 
-Cabinet is an AI-first self-hosted knowledge base and startup OS. All content lives as markdown files on disk. The web UI provides WYSIWYG editing, a collapsible tree sidebar, drag-and-drop page organization, structured AI runs for tasks/jobs/heartbeats, and interactive `WebTerminal` surfaces for direct CLI sessions.
+Cabinet is an AI-first self-hosted knowledge base and research OS. All content lives as markdown files on disk. The web UI provides WYSIWYG editing, a collapsible tree sidebar, drag-and-drop page organization, structured AI runs for tasks/jobs/heartbeats, and interactive `WebTerminal` surfaces for direct CLI sessions.
 
 **Core philosophy:** Humans define intent. Agents do the work. The knowledge base is the shared memory between both.
 

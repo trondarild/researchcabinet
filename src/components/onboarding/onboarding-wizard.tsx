@@ -1,12 +1,11 @@
 "use client";
 
-import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   CheckCircle2,
-  Cloud,
   Check,
   ClipboardCheck,
   Copy,
@@ -17,8 +16,6 @@ import {
   ChevronDown,
   ChevronRight,
   RefreshCw,
-  Sparkles,
-  Star,
   Terminal,
   Users,
   XCircle,
@@ -58,34 +55,12 @@ interface SuggestedAgent {
   checked: boolean;
 }
 
-interface CommunityCard {
-  title: string;
-  description: string;
-  cta: string;
-  href?: string;
-  icon: ReactNode;
-  iconClassName: string;
-}
 
-interface CommunityStepConfig {
-  eyebrow: string;
-  title: string;
-  description: string;
-  aside?: string;
-  cards: CommunityCard[];
-  nextLabel?: string;
-}
-
-const DISCORD_SUPPORT_URL = "https://discord.gg/hJa5TRTbTH";
-const GITHUB_REPO_URL = "https://github.com/hilash/cabinet";
-const GITHUB_STATS_URL = "/api/github/repo";
-const GITHUB_STARS_FALLBACK = 393;
-const CABINET_CLOUD_URL = "https://runcabinet.com/waitlist";
-const ROLES = ["CEO", "Marketer", "Engineer", "Designer", "Product", "Other"];
+const RUNCABINET_URL = "https://runcabinet.com";
+const ROLES = ["Principal Investigator", "Researcher", "Lab Manager", "Data Scientist", "Research Engineer", "Other"];
 const TEAM_SIZES = ["Just me", "2-5", "5-20", "20+"];
-const COMMUNITY_START_STEP = 4;
-const COMMUNITY_END_STEP = 6;
-const STEP_COUNT = 8;
+const LAUNCH_STEP = 4;
+const STEP_COUNT = 5;
 
 /* ─── Colors from runcabinet.com ─── */
 const WEB = {
@@ -103,102 +78,22 @@ const WEB = {
   borderDark: "#D4C4B0",
 } as const;
 
-function DiscordIcon({ className, style }: { className?: string; style?: CSSProperties }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-      className={className}
-      style={style}
-    >
-      <path d="M20.32 4.37a16.4 16.4 0 0 0-4.1-1.28.06.06 0 0 0-.07.03c-.18.32-.38.73-.52 1.06a15.16 15.16 0 0 0-4.56 0c-.15-.34-.35-.74-.53-1.06a.06.06 0 0 0-.07-.03c-1.43.24-2.8.68-4.1 1.28a.05.05 0 0 0-.02.02C3.77 8.17 3.12 11.87 3.44 15.53a.06.06 0 0 0 .02.04 16.52 16.52 0 0 0 5.03 2.54.06.06 0 0 0 .07-.02c.39-.54.74-1.12 1.04-1.73a.06.06 0 0 0-.03-.08 10.73 10.73 0 0 1-1.6-.77.06.06 0 0 1-.01-.1l.32-.24a.06.06 0 0 1 .06-.01c3.35 1.53 6.98 1.53 10.29 0a.06.06 0 0 1 .06 0c.1.08.21.16.32.24a.06.06 0 0 1-.01.1c-.51.3-1.05.56-1.6.77a.06.06 0 0 0-.03.08c.3.61.65 1.19 1.04 1.73a.06.06 0 0 0 .07.02 16.42 16.42 0 0 0 5.03-2.54.06.06 0 0 0 .02-.04c.38-4.23-.64-7.9-2.89-11.14a.04.04 0 0 0-.02-.02ZM9.68 13.3c-.98 0-1.78-.9-1.78-2s.79-2 1.78-2c.99 0 1.79.9 1.78 2 0 1.1-.8 2-1.78 2Zm4.64 0c-.98 0-1.78-.9-1.78-2s.79-2 1.78-2c.99 0 1.79.9 1.78 2 0 1.1-.79 2-1.78 2Z" />
-    </svg>
-  );
-}
-
-function formatGithubStars(stars: number) {
-  return new Intl.NumberFormat("en-US").format(stars);
-}
-
-function CommunityCardTile({ card }: { card: CommunityCard }) {
-  const content = (
-    <>
-      <div
-        className="flex size-10 items-center justify-center rounded-xl border"
-        style={{
-          borderColor: WEB.borderLight,
-          background: WEB.accentBg,
-          color: WEB.accent,
-        }}
-      >
-        {card.icon}
-      </div>
-
-      <div className="mt-4 flex flex-col gap-1">
-        <p className="text-sm font-semibold" style={{ color: WEB.text }}>
-          {card.title}
-        </p>
-        <p className="text-sm leading-relaxed" style={{ color: WEB.textSecondary }}>
-          {card.description}
-        </p>
-      </div>
-    </>
-  );
-
-  if (!card.href) {
-    return (
-      <div
-        className="rounded-xl p-4"
-        style={{
-          border: `1px solid ${WEB.border}`,
-          background: WEB.bgCard,
-        }}
-      >
-        {content}
-      </div>
-    );
-  }
-
-  return (
-    <a
-      href={card.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group rounded-xl p-4 transition-all hover:-translate-y-0.5"
-      style={{
-        border: `1px solid ${WEB.border}`,
-        background: WEB.bgCard,
-      }}
-    >
-      {content}
-      <div
-        className="mt-4 inline-flex items-center gap-1 text-sm font-medium"
-        style={{ color: WEB.accent }}
-      >
-        <span>{card.cta}</span>
-        <ArrowUpRight className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-      </div>
-    </a>
-  );
-}
 
 /* ─── Keyword → agent pre-check mapping ─── */
 const KEYWORD_CHECKS: [RegExp, string[]][] = [
-  [/content|blog|social|market|brand|newsletter/, ["content-marketer", "social-media", "copywriter"]],
-  [/seo|search|rank|keyword|organic|google/, ["seo"]],
-  [/sales|lead|outreach|revenue|pipeline|deal/, ["sales", "customer-success"]],
-  [/quality|review|proofread|test|audit/, ["qa"]],
-  [/tech|code|engineer|dev|infra|deploy/, ["cto", "devops"]],
-  [/product|feature|roadmap|user research/, ["product-manager"]],
-  [/design|ux|wireframe|prototype/, ["ux-designer"]],
-  [/data|analytics|metrics|dashboard/, ["data-analyst"]],
-  [/finance|budget|runway|fundraise/, ["cfo"]],
-  [/growth|funnel|acquisition|conversion/, ["growth-marketer"]],
-  [/research|competitive|market analysis/, ["researcher"]],
-  [/legal|compliance|contract|privacy/, ["legal"]],
-  [/hiring|culture|hr|onboarding|team health/, ["people-ops"]],
-  [/operations|process|efficiency/, ["coo"]],
+  [/literature|papers|reading|review/, ["researcher", "trend-scout"]],
+  [/data|analysis|statistics|pipeline|computation/, ["data-analyst", "cto"]],
+  [/grant|funding|budget|neh|nsf|erc/, ["cfo", "copywriter"]],
+  [/publish|manuscript|journal|paper|submission/, ["post-optimizer", "editor"]],
+  [/outreach|communication|social|twitter|blog/, ["content-marketer", "social-media"]],
+  [/experiment|protocol|methods|design/, ["researcher"]],
+  [/seminar|teaching|course|lecture/, ["researcher"]],
+  [/quality|review|proofread|audit/, ["qa"]],
+  [/code|software|infra|deploy|compute/, ["cto", "devops"]],
+  [/project|milestone|planning|coordination/, ["product-manager"]],
+  [/legal|compliance|contract|ethics/, ["legal"]],
+  [/hiring|onboarding|team|members/, ["people-ops"]],
+  [/operations|process|lab management/, ["coo"]],
 ];
 
 const ALWAYS_CHECKED = new Set(["ceo", "editor"]);
@@ -211,27 +106,24 @@ interface PreMadeTeam {
 }
 
 const PRE_MADE_TEAMS: PreMadeTeam[] = [
-  { name: "Content Engine", description: "Blog posts, newsletters & social media on autopilot", agents: 5, domain: "Marketing" },
-  { name: "Cold Email Agency", description: "ICP research, list building, copy & sending", agents: 7, domain: "Sales" },
-  { name: "Carousel Factory", description: "Design Instagram, LinkedIn & TikTok carousels", agents: 4, domain: "Marketing" },
-  { name: "SEO War Room", description: "Keyword research, write, optimize & rank", agents: 6, domain: "Marketing" },
-  { name: "LinkedIn Lead Gen Shop", description: "Profile optimization, connections & DM sequences", agents: 5, domain: "Sales" },
-  { name: "Podcast Booking Agency", description: "Research shows, pitch, schedule & prep talking points", agents: 6, domain: "Media" },
-  { name: "TikTok Shop Operator", description: "Product listings, affiliate outreach & live stream", agents: 8, domain: "E-commerce" },
-  { name: "Ghostwriting Studio", description: "LinkedIn posts, Twitter threads & newsletters", agents: 5, domain: "Content" },
-  { name: "PR Pitching Machine", description: "Media list, write pitches, send & track", agents: 5, domain: "Marketing" },
-  { name: "App Store Optimization", description: "Keyword research, screenshots & A/B test", agents: 5, domain: "Marketing" },
-  { name: "Shopify Store Setup", description: "Theme, products, payments & launch checklist", agents: 5, domain: "E-commerce" },
-  { name: "Proposal & RFP Factory", description: "Parse RFPs, draft responses, format & submit", agents: 6, domain: "Services" },
+  { name: "Neuroscience Lab", description: "Literature review, data analysis, and grant tracking for systems neuroscience", agents: 4, domain: "Life Sciences" },
+  { name: "Computational Lab", description: "Pipeline management, reproducibility, and publication support", agents: 3, domain: "Computation" },
+  { name: "Clinical Research Unit", description: "Protocol management, regulatory docs, and milestone tracking", agents: 4, domain: "Clinical" },
+  { name: "Solo Researcher", description: "Literature, writing, and project management for one", agents: 2, domain: "Research" },
+  { name: "Theory Group", description: "Argument mapping, seminar planning, and manuscript review", agents: 3, domain: "Humanities" },
+  { name: "Ecology Field Lab", description: "Field data, species tracking, and conservation reporting", agents: 4, domain: "Life Sciences" },
+  { name: "Social Science Lab", description: "Survey design, qualitative coding, and ethics review", agents: 4, domain: "Social Science" },
+  { name: "Materials Science Group", description: "Characterization data, synthesis protocols, and patent tracking", agents: 4, domain: "Engineering" },
 ];
 
 const TEAM_DOMAIN_COLORS: Record<string, { bg: string; text: string }> = {
-  Marketing: { bg: "#EDE7F6", text: "#6B4FA0" },
-  Sales: { bg: "#FCE4EC", text: "#B0475A" },
-  Media: { bg: "#E8EAF6", text: "#4A5899" },
-  "E-commerce": { bg: "#E0F2F1", text: "#3A7A6D" },
-  Content: { bg: "#FFF8E1", text: "#8D7039" },
-  Services: { bg: "#E3F2FD", text: "#4A7FB5" },
+  "Life Sciences": { bg: "#E8F5E9", text: "#2E7D32" },
+  Computation: { bg: "#E3F2FD", text: "#1565C0" },
+  Clinical: { bg: "#FCE4EC", text: "#B0475A" },
+  Research: { bg: "#EDE7F6", text: "#6B4FA0" },
+  Humanities: { bg: "#FFF8E1", text: "#8D7039" },
+  "Social Science": { bg: "#E0F2F1", text: "#3A7A6D" },
+  Engineering: { bg: "#FBE9E7", text: "#BF360C" },
 };
 
 function TerminalCommand({ command }: { command: string }) {
@@ -353,22 +245,11 @@ function TeamCarousel({
 }
 
 function IntroStep({ onNext }: { onNext: () => void }) {
-  const [phase, setPhase] = useState(0);
-  // 0: nothing  1: card border + "cabinet" title  2: pronunciation + noun
-  // 3: def 1  4: def 2  5: def 3  6: tagline line 1  7: tagline line 2  8: button
+  const phase = 8;
 
-  useEffect(() => {
-    const delays = [300, 600, 1100, 1700, 2300, 3100, 3700, 4200];
-    const timers = delays.map((ms, i) =>
-      setTimeout(() => setPhase(i + 1), ms)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  const fade = (p: number): CSSProperties => ({
-    opacity: phase >= p ? 1 : 0,
-    transform: phase >= p ? "translateY(0)" : "translateY(14px)",
-    transition: "opacity 0.6s ease, transform 0.6s ease",
+  const fade = (_p: number): CSSProperties => ({
+    opacity: 1,
+    transform: "translateY(0)",
   });
 
   return (
@@ -379,11 +260,8 @@ function IntroStep({ onNext }: { onNext: () => void }) {
           className="text-left rounded-2xl px-8 py-8 md:px-10 md:py-10 flex-1"
           style={{
             background: WEB.bgCard,
-            border: `1px solid ${phase >= 1 ? WEB.border : "transparent"}`,
-            boxShadow: phase >= 1
-              ? "0 1px 3px rgba(59, 47, 47, 0.04), 0 8px 30px rgba(59, 47, 47, 0.04)"
-              : "none",
-            transition: "border-color 0.5s ease, box-shadow 0.8s ease",
+            border: `1px solid ${WEB.border}`,
+            boxShadow: "0 1px 3px rgba(59, 47, 47, 0.04), 0 8px 30px rgba(59, 47, 47, 0.04)",
           }}
         >
           <div className="flex items-baseline gap-3 mb-1" style={fade(1)}>
@@ -391,14 +269,8 @@ function IntroStep({ onNext }: { onNext: () => void }) {
               className="font-logo text-4xl sm:text-5xl tracking-tight italic"
               style={{ color: WEB.text }}
             >
-              cabinet
+              research cabinet
             </h1>
-            <span
-              className="font-mono text-xs"
-              style={{ ...fade(2), color: WEB.textTertiary }}
-            >
-              /&#x2C8;kab.&#x26A;.n&#x259;t/
-            </span>
           </div>
           <p
             className="font-mono text-xs italic mb-6"
@@ -446,10 +318,10 @@ function IntroStep({ onNext }: { onNext: () => void }) {
                   >
                     software
                   </span>
-                  An AI-first knowledge base where a team of AI agents work for you 24/7 (no salary needed).
+                  An AI-first knowledge base for scientific research, where a team of AI agents review literature, track projects, and draft outputs — while you do the thinking.
                 </p>
                 <p className="font-mono text-xs italic mt-1.5" style={{ color: WEB.textTertiary }}>
-                  &ldquo;I asked my cabinet to research the market and draft the blog post&rdquo;
+                  &ldquo;I asked my cabinet to review the literature and draft the methods section&rdquo;
                 </p>
               </div>
             </li>
@@ -460,7 +332,7 @@ function IntroStep({ onNext }: { onNext: () => void }) {
         <div className="flex flex-col items-center lg:items-start gap-6 py-6 lg:py-0 lg:max-w-xs shrink-0">
           <h2 className="text-center lg:text-left text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.1]">
             <span className="font-logo italic" style={{ ...fade(6), color: WEB.text, display: "inline-block" }}>
-              Your knowledge base.
+              Your research memory.
             </span>
             <br />
             <span
@@ -474,7 +346,7 @@ function IntroStep({ onNext }: { onNext: () => void }) {
                 backgroundClip: "text",
               }}
             >
-              Your AI team.
+              Your AI lab team.
             </span>
           </h2>
 
@@ -543,7 +415,7 @@ function CabinetCreatedScreen({
   }, [visibleLines, treeLines.length]);
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-8 animate-in fade-in duration-500">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-8 ">
       <div className="text-center space-y-2">
         <CheckCircle2 className="size-10 mx-auto" style={{ color: WEB.accent }} />
         <h1 className="font-logo text-2xl tracking-tight italic" style={{ color: WEB.text }}>
@@ -635,7 +507,7 @@ function WelcomeBackStep({
   }, []);
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-8 animate-in fade-in duration-500">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-8 ">
       <div
         className="text-center space-y-3 transition-all duration-700"
         style={{ opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(12px)" }}
@@ -1026,17 +898,17 @@ function TeamBuildStep({
 
 const DEPARTMENT_ORDER: [string, string][] = [
   ["leadership", "Leadership"],
-  ["marketing", "Marketing"],
+  ["research", "Research"],
+  ["analytics", "Research"],
   ["engineering", "Engineering"],
-  ["product", "Product & Design"],
-  ["design", "Product & Design"],
-  ["sales", "Business"],
-  ["support", "Business"],
-  ["analytics", "Business"],
-  ["research", "Business"],
-  ["finance", "Finance & Ops"],
-  ["legal", "Finance & Ops"],
-  ["hr", "Finance & Ops"],
+  ["operations", "Operations"],
+  ["administration", "Operations"],
+  ["hr", "Operations"],
+  ["communications", "Communications"],
+  ["design", "Communications"],
+  ["legal", "Legal & Admin"],
+  ["finance", "Legal & Admin"],
+  ["publishing", "Communications"],
 ];
 
 function getDepartmentLabel(dept: string): string {
@@ -1103,35 +975,35 @@ function AgentChatPreview({ agents, companyName }: { agents: SuggestedAgent[]; c
     if (!ceo) return [];
 
     const script: { agent: SuggestedAgent; text: string }[] = [
-      { agent: ceo, text: `Good morning team! Welcome to ${companyName || "the company"}. Let's hit the ground running.` },
+      { agent: ceo, text: `Good morning team! Welcome to ${companyName || "the lab"}. Let's have a productive week.` },
     ];
 
     if (others[0]) {
       script.push(
-        { agent: ceo, text: `${others[0].name}, can you start on competitor research?` },
-        { agent: others[0], text: "On it. I'll have a landscape overview ready by end of day." },
+        { agent: ceo, text: `${others[0].name}, can you start a literature review on our main research question?` },
+        { agent: others[0], text: "On it. I'll have a summary of key papers ready by end of day." },
       );
     }
     if (others[1]) {
       script.push(
-        { agent: ceo, text: `${others[1].name}, let's get our content calendar set up.` },
-        { agent: others[1], text: "Already drafting a plan. I'll share it in #content shortly." },
+        { agent: ceo, text: `${others[1].name}, let's get our project milestones documented.` },
+        { agent: others[1], text: "Already drafting a plan. I'll share it in #general shortly." },
       );
     }
     if (others[0] && others[1]) {
       script.push(
-        { agent: others[0], text: `${others[1].name}, I found some gaps in our positioning. Want to sync?` },
-        { agent: others[1], text: "Yes! Let's coordinate. I can weave the insights into our first blog post." },
+        { agent: others[0], text: `${others[1].name}, I found some relevant recent preprints. Want to review them together?` },
+        { agent: others[1], text: "Yes! I can fold those findings into our research brief." },
       );
     }
     if (others[2]) {
       script.push(
         { agent: ceo, text: `${others[2].name}, what's the status on your side?` },
-        { agent: others[2], text: "Setting up the foundational workflows now. Looking good so far." },
+        { agent: others[2], text: "Setting up the analysis environment now. Looking good so far." },
       );
     }
     script.push(
-      { agent: ceo, text: "Great energy everyone. Let's make this a strong first week." },
+      { agent: ceo, text: "Great start everyone. Let's make this a strong first week." },
     );
 
     return script;
@@ -1240,7 +1112,6 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const [libraryTemplates, setLibraryTemplates] = useState<LibraryTemplate[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [launching, setLaunching] = useState(false);
-  const [githubStars, setGithubStars] = useState(GITHUB_STARS_FALLBACK);
   const [providersLoading, setProvidersLoading] = useState(true);
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
@@ -1260,29 +1131,6 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const activeModels = activeProvider?.models || [];
   const activeEffortLevels = getModelEffortLevels(activeProvider, activeModel?.id);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchGitHubStats = async () => {
-      try {
-        const res = await fetch(GITHUB_STATS_URL, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        if (!res.ok) return;
-
-        const data = await res.json();
-        if (typeof data.stars === "number") {
-          setGithubStars(data.stars);
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    void fetchGitHubStats();
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     fetch("/api/system/cabinet-manifest")
@@ -1355,9 +1203,9 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
         }))
       );
     } catch {
-      // Fallback: at least offer CEO + Editor
+      // Fallback: at least offer Research Director + Editor
       setSuggestedAgents([
-        { slug: "ceo", name: "CEO Agent", emoji: "\u{1F3AF}", role: "Strategic planning, goal tracking, task delegation", checked: true },
+        { slug: "ceo", name: "Research Director", emoji: "🔬", role: "Research strategy, goal tracking, team coordination", checked: true },
         { slug: "editor", name: "Editor", emoji: "\u{1F4DD}", role: "KB content, documentation, formatting", checked: true },
       ]);
     } finally {
@@ -1368,7 +1216,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const MAX_AGENTS = 5;
 
   const toggleAgent = (slug: string) => {
-    // CEO and Editor are mandatory — cannot be unchecked
+    // Research Director and Editor are mandatory — cannot be unchecked
     if (ALWAYS_CHECKED.has(slug)) return;
 
     setSuggestedAgents((prev) => {
@@ -1423,80 +1271,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const selectedAgentCount = suggestedAgents.filter(
     (agent) => agent.checked
   ).length;
-  const communitySteps: CommunityStepConfig[] = [
-    {
-      eyebrow: "GitHub",
-      title: "Help the Cabinet community grow",
-      description:
-        "A GitHub star helps more people discover Cabinet and join the community.",
-      aside:
-        "Cabinet is open source. If you like the vision, help us spread the word.",
-      nextLabel: "Next",
-      cards: [],
-    },
-    {
-      eyebrow: "Discord",
-      title: "Discord is where the good weirdness happens.",
-      description:
-        "This is where feedback turns into features, screenshots turn into debates, and somebody usually finds the edge case before it finds you.",
-      aside:
-        "If you want new features first and prefer 'come chat' over 'please submit a ticket,' this is your room.",
-      nextLabel: "Next",
-      cards: [
-        {
-          title: "Join the Discord",
-          description:
-            "Meet the people building Cabinet, see what's shipping, and toss ideas into the fire while they are still hot.",
-          cta: "Join the chat",
-          href: DISCORD_SUPPORT_URL,
-          icon: <DiscordIcon className="size-4" />,
-          iconClassName: "",
-        },
-        {
-          title: "Why people stay",
-          description:
-            "Early features, fast answers, behind-the-scenes progress, and the occasional delightful chaos of building in public.",
-          cta: "",
-          icon: <Sparkles className="size-4" />,
-          iconClassName: "",
-        },
-      ],
-    },
-    {
-      eyebrow: "Cabinet Cloud",
-      title: "Cabinet Cloud is for people who want the magic without babysitting the plumbing.",
-      description:
-        "Self-hosting is great until you're explaining ports, sync, and local setup to a teammate who just wanted the doc to open.",
-      aside:
-        "Cloud is the future easy button: easier sharing, less setup, and fewer heroic acts of yak shaving before coffee.",
-      cards: [
-        {
-          title: "Join the Cabinet Cloud waitlist",
-          description:
-            "Raise your hand if you want the hosted version first when it is ready.",
-          cta: "Register for Cabinet Cloud",
-          href: CABINET_CLOUD_URL,
-          icon: <Cloud className="size-4" />,
-          iconClassName: "",
-        },
-        {
-          title: "Why people want it",
-          description:
-            "Less setup, easier sharing, faster onboarding for teams, and a much lower chance of explaining terminal tabs before lunch.",
-          cta: "",
-          icon: <Rocket className="size-4" />,
-          iconClassName: "",
-        },
-      ],
-    },
-  ];
-  const communityStep =
-    step >= COMMUNITY_START_STEP && step <= COMMUNITY_END_STEP
-      ? communitySteps[step - COMMUNITY_START_STEP]
-      : null;
-  const isGitHubCommunityStep = communityStep?.eyebrow === "GitHub";
   const launchDisabled = launching || selectedAgentCount === 0;
-  const starsLabel = `${formatGithubStars(githubStars)} GitHub stars`;
 
   /* ─── Shared inline styles (website tokens) ─── */
   const inputStyle: React.CSSProperties = {
@@ -1513,7 +1288,18 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: WEB.bg, color: WEB.text }}>
+    <div className="min-h-screen relative" style={{ background: WEB.bg, color: WEB.text }}>
+      {/* Built-on notice */}
+      <a
+        href={RUNCABINET_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-4 left-4 z-50 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium"
+        style={{ background: WEB.bgCard, border: `1px solid ${WEB.border}`, color: WEB.textTertiary }}
+      >
+        built on runcabinet
+        <ExternalLink className="size-2.5" />
+      </a>
       <div
         className="mx-auto flex min-h-screen w-full max-w-3xl items-center justify-center px-6 py-10"
         style={dotGridStyle}
@@ -1541,7 +1327,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
 
           {/* Step 1: Welcome — About you */}
           {step === 1 && (
-            <div className="mx-auto flex max-w-xl flex-col gap-8 animate-in fade-in duration-300">
+            <div className="mx-auto flex max-w-xl flex-col gap-8 ">
               <div className="text-center space-y-2">
                 <h1 className="font-logo text-2xl tracking-tight italic">
                   Welcome to <span style={{ color: WEB.accent }}>your</span> Cabinet
@@ -1566,14 +1352,14 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium" style={{ color: WEB.text }}>
-                    What&apos;s your company or project name?
+                    What&apos;s your lab or research group name?
                   </label>
                   <input
                     value={answers.companyName}
                     onChange={(e) =>
                       setAnswers({ ...answers, companyName: e.target.value })
                     }
-                    placeholder="Acme Corp"
+                    placeholder="Smith Lab"
                     style={inputStyle}
                   />
                 </div>
@@ -1587,7 +1373,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                     onChange={(e) =>
                       setAnswers({ ...answers, description: e.target.value })
                     }
-                    placeholder="We make a podcast about AI startups"
+                    placeholder="We study neural circuits in model organisms"
                     style={inputStyle}
                   />
                 </div>
@@ -1674,7 +1460,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
 
           {/* Step 3: AI Provider Check */}
           {step === 3 && (
-            <div className="mx-auto flex max-w-xl flex-col gap-6 animate-in fade-in duration-300">
+            <div className="mx-auto flex max-w-xl flex-col gap-6 ">
               <div className="text-center space-y-2">
                 <h1 className="font-logo text-2xl tracking-tight italic">
                   Agent Provider
@@ -2019,7 +1805,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   Back
                 </button>
                 <button
-                  onClick={() => setStep(COMMUNITY_START_STEP)}
+                  onClick={() => setStep(LAUNCH_STEP)}
                   className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
                   style={{ background: WEB.accent }}
                 >
@@ -2030,198 +1816,13 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
             </div>
           )}
 
-          {/* Steps 5-7: Community */}
-          {communityStep && (
-            <div className="relative mx-auto flex max-w-2xl flex-col gap-8 animate-in fade-in duration-300">
-              {/* Floating emoji backdrop per community step */}
-              {(() => {
-                const emojiMap: Record<string, string> = {
-                  "Cabinet Cloud": "☁️",
-                };
-                const emoji = emojiMap[communityStep.eyebrow];
-                if (!emoji) return null;
-                return (
-                  <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-                    {[
-                      { top: "-5%", left: "-8%", duration: "34s", delay: "-8s", opacity: 0.45, reverse: false },
-                      { top: "5%", left: "55%", duration: "42s", delay: "-17s", opacity: 0.4, reverse: true },
-                      { top: "40%", left: "-5%", duration: "38s", delay: "-12s", opacity: 0.38, reverse: true },
-                      { top: "50%", left: "60%", duration: "46s", delay: "-22s", opacity: 0.4, reverse: false },
-                      { top: "75%", left: "20%", duration: "40s", delay: "-5s", opacity: 0.35, reverse: false },
-                    ].map((cloud, i) => (
-                      <div
-                        key={i}
-                        className={`waitlist-cloud-row absolute ${cloud.reverse ? "waitlist-cloud-row-reverse" : ""}`}
-                        style={{
-                          top: cloud.top,
-                          left: cloud.left,
-                          opacity: cloud.opacity,
-                          ["--cloud-row-duration" as string]: cloud.duration,
-                          animationDelay: cloud.delay,
-                        }}
-                      >
-                        <span
-                          className={`select-none leading-none ${
-                            communityStep.eyebrow === "Cabinet Cloud"
-                              ? "text-[280px] sm:text-[400px]"
-                              : "text-[180px] sm:text-[260px]"
-                          }`}
-                          style={{ filter: "drop-shadow(0 18px 26px rgba(214,194,160,0.22))" }}
-                        >
-                          {emoji}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-              <div
-                className="relative z-10 rounded-2xl p-5 sm:p-6"
-                style={{
-                  border: `1px solid ${WEB.border}`,
-                  background: communityStep.eyebrow === "Cabinet Cloud"
-                    ? `linear-gradient(180deg, rgba(252,249,244,0.96), rgba(247,241,232,0.94))`
-                    : WEB.bgCard,
-                  boxShadow: "0 1px 3px rgba(59, 47, 47, 0.04), 0 8px 30px rgba(59, 47, 47, 0.04)",
-                }}
-              >
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      <h2
-                        className="font-logo text-xl tracking-tight italic"
-                        style={{ color: WEB.text }}
-                      >
-                        {communityStep.title}
-                      </h2>
-                      <p className="text-sm leading-relaxed" style={{ color: WEB.textSecondary }}>
-                        {communityStep.description}
-                      </p>
-                      {communityStep.aside && (
-                        <p className="text-sm leading-relaxed" style={{ color: WEB.textSecondary }}>
-                          {communityStep.aside}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
 
-                {/* Big CTA buttons — same style across all community steps */}
-                {isGitHubCommunityStep && (
-                  <div className="pt-6">
-                    <a
-                      href={GITHUB_REPO_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex w-full items-center justify-between gap-4 rounded-full px-5 py-5 sm:px-6 sm:py-6 transition-all hover:-translate-y-0.5"
-                      style={{ background: WEB.accentBg, border: `1px solid ${WEB.border}` }}
-                    >
-                      <span className="flex min-w-0 items-center gap-4">
-                        <span className="flex size-11 shrink-0 items-center justify-center rounded-full shadow-sm" style={{ background: WEB.bgCard }}>
-                          <Star className="size-5 fill-current" style={{ color: WEB.accent }} />
-                        </span>
-                        <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-                          <span className="truncate text-base font-semibold sm:text-lg" style={{ color: WEB.text }}>Star Cabinet on GitHub</span>
-                          <span className="text-sm" style={{ color: WEB.textSecondary }}>Help more people find the community</span>
-                        </span>
-                      </span>
-                      <span className="hidden shrink-0 rounded-full px-3 py-1 text-sm font-semibold sm:inline-flex" style={{ background: WEB.bgWarm, color: WEB.accent }}>
-                        {starsLabel}
-                      </span>
-                    </a>
-                  </div>
-                )}
-
-                {communityStep.eyebrow === "Discord" && (
-                  <div className="pt-6">
-                    <a
-                      href={DISCORD_SUPPORT_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex w-full items-center justify-between gap-4 rounded-full px-5 py-5 sm:px-6 sm:py-6 transition-all hover:-translate-y-0.5"
-                      style={{ background: "#ECEAFD", border: "1px solid #D8D4F7" }}
-                    >
-                      <span className="flex min-w-0 items-center gap-4">
-                        <span className="flex size-11 shrink-0 items-center justify-center rounded-full shadow-sm" style={{ background: WEB.bgCard }}>
-                          <DiscordIcon className="size-5" style={{ color: "#5865F2" }} />
-                        </span>
-                        <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-                          <span className="truncate text-base font-semibold sm:text-lg" style={{ color: WEB.text }}>Join the Discord</span>
-                          <span className="text-sm" style={{ color: WEB.textSecondary }}>Chat with the people building Cabinet</span>
-                        </span>
-                      </span>
-                      <span className="hidden shrink-0 rounded-full px-3 py-1 text-sm font-semibold sm:inline-flex" style={{ background: "#D8D4F7", color: "#5865F2" }}>
-                        Join
-                      </span>
-                    </a>
-                  </div>
-                )}
-
-                {communityStep.eyebrow === "Cabinet Cloud" && (
-                  <div className="pt-6">
-                    <a
-                      href={CABINET_CLOUD_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex w-full items-center justify-between gap-4 rounded-full px-5 py-5 sm:px-6 sm:py-6 transition-all hover:-translate-y-0.5"
-                      style={{ background: WEB.accentBg, border: `1px solid ${WEB.border}` }}
-                    >
-                      <span className="flex min-w-0 items-center gap-4">
-                        <span className="flex size-11 shrink-0 items-center justify-center rounded-full shadow-sm" style={{ background: WEB.bgCard }}>
-                          <Cloud className="size-5" style={{ color: WEB.accent }} />
-                        </span>
-                        <span className="flex min-w-0 flex-col items-start gap-0.5 text-left">
-                          <span className="truncate text-base font-semibold sm:text-lg" style={{ color: WEB.text }}>Join the Cabinet Cloud waitlist</span>
-                          <span className="text-sm" style={{ color: WEB.textSecondary }}>Get the hosted version when it&apos;s ready</span>
-                        </span>
-                      </span>
-                      <span className="hidden shrink-0 rounded-full px-3 py-1 text-sm font-semibold sm:inline-flex" style={{ background: WEB.bgWarm, color: WEB.accent }}>
-                        Waitlist
-                      </span>
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
-                <button
-                  onClick={() => setStep(step - 1)}
-                  className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium transition-colors"
-                  style={{ color: WEB.textSecondary }}
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  Back
-                </button>
-                {step < COMMUNITY_END_STEP ? (
-                  <button
-                    onClick={() => setStep(step + 1)}
-                    disabled={launching}
-                    className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
-                    style={{ background: WEB.accent }}
-                  >
-                    {communityStep.nextLabel}
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setStep(COMMUNITY_END_STEP + 1)}
-                    className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5"
-                    style={{ background: WEB.accent }}
-                  >
-                    Next
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Step 7: Launch — Summary + data directory */}
-          {step === COMMUNITY_END_STEP + 1 && (
-            <div className="mx-auto flex max-w-4xl flex-col gap-6 animate-in fade-in duration-300">
+          {/* Step 4: Launch — Summary + data directory */}
+          {step === LAUNCH_STEP && (
+            <div className="mx-auto flex max-w-4xl flex-col gap-6 ">
               <div className="text-center space-y-2">
                 <h1 className="font-logo text-2xl tracking-tight italic">
-                  Start your <span style={{ color: WEB.accent }}>Cabinet</span>
+                  Launch your <span style={{ color: WEB.accent }}>Research Cabinet</span>
                 </h1>
               </div>
 
@@ -2300,7 +1901,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
 
               <div className="flex items-center justify-between pt-2">
                 <button
-                  onClick={() => setStep(COMMUNITY_END_STEP)}
+                  onClick={() => setStep(3)}
                   className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium transition-colors"
                   style={{ color: WEB.textSecondary }}
                 >

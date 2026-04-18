@@ -26,7 +26,7 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: "Cabinet",
-  description: "AI-first knowledge base and startup OS",
+  description: "AI-first knowledge base and research OS",
 };
 
 export default function RootLayout({
@@ -43,7 +43,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: `if(window.CabinetDesktop)document.documentElement.classList.add("electron-desktop")` }} />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

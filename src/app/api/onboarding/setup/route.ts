@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       kind: "root",
       description: answers.description,
       body: answers.description,
-      tags: ["company"],
+      tags: ["research"],
       skipExisting: true,
     });
 
@@ -161,12 +161,12 @@ export async function POST(req: NextRequest) {
     }
 
     const channelDescriptions: Record<string, string> = {
-      general: "Company-wide announcements and discussion",
-      leadership: "Strategic planning and goal setting",
-      marketing: "Marketing campaigns, content, and SEO",
-      content: "Content creation, editing, and review",
-      sales: "Lead generation, outreach, and deals",
-      engineering: "Technical work and code quality",
+      general: "Lab-wide announcements and discussion",
+      leadership: "Research strategy and goal setting",
+      research: "Literature, hypotheses, and experimental design",
+      communications: "Outreach, publications, and science communication",
+      grants: "Funding, budgets, and grant reporting",
+      engineering: "Computational work, data pipelines, and tooling",
     };
 
     const channels = Array.from(channelMembers.entries()).map(

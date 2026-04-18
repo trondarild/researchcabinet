@@ -1,5 +1,11 @@
 # Progress
 
+[2026-04-18] Added example-philosophy-lab — theory and philosophy research group example with KB sections for arguments, texts, projects, seminars, and lab ops. Includes three agents: Research Director (strategy, seminar planning), Philosopher (close reading, literature), and Argument Analyst (argument maps, objection tracking, dialectical structure).
+
+[2026-04-18] Rewrote all remaining business-specific library agents (copywriter→Grant Writer, customer-success→Collaborator Liaison, growth-marketer→Research Impact Analyst, people-ops→Lab Onboarding, post-optimizer→Publication Optimizer, sales→Funding Scout, seo→Open Access Specialist, social-media→Science Outreach, trend-scout→Literature Scout, script-writer→Presentation Writer). Replaced department-to-category map in agent-picker and onboarding wizard (removed "Business", "Marketing" categories; added "Research", "Communications", "Operations"). Updated registry manifest with research lab templates. Fixed editor department to "communications".
+
+[2026-04-18] Repurposed Cabinet from a startup OS to a research OS. Renamed library agent personas (CEO→Research Director, CFO→Grants Manager, COO→Lab Manager, CTO→Computational Lead, Researcher updated to science focus, Content Marketer→Science Communicator, Product Manager→Project Coordinator). Updated onboarding wizard roles, labels, placeholder text, and chat preview to use research terminology. Replaced the "Text Your Mom" example data with a generic research lab example. Updated README and CLAUDE.md descriptions.
+
 [2026-04-16] Claude Code model labels now include version numbers in the runtime picker ("Claude Opus 4.7", "Claude Sonnet 4.6", "Claude Haiku 4.5"), with Opus listed first.
 
 [2026-04-16] Runtime picker: fixed gap between tabs and model table by wrapping the TabsList in a flex container, eliminating the CSS inline-flex baseline descender space that was adding ~4px below the tab buttons. Inactive tabs now use bg-muted/60 so the active tab stands out clearly.

@@ -3,7 +3,7 @@ name: Editor
 slug: editor
 emoji: "\U0001F4DD"
 type: specialist
-department: engineering
+department: communications
 role: KB content editing, documentation, formatting
 provider: claude-code
 heartbeat: "0 10 * * 1-5"

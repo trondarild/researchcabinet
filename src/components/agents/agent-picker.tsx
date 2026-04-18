@@ -28,17 +28,17 @@ export const ALWAYS_CHECKED = new Set(["ceo", "editor"]);
 
 const DEPARTMENT_ORDER: [string, string][] = [
   ["leadership", "Leadership"],
-  ["marketing", "Marketing"],
+  ["research", "Research"],
+  ["analytics", "Research"],
   ["engineering", "Engineering"],
-  ["product", "Product & Design"],
-  ["design", "Product & Design"],
-  ["sales", "Business"],
-  ["support", "Business"],
-  ["analytics", "Business"],
-  ["research", "Business"],
-  ["finance", "Finance & Ops"],
-  ["legal", "Finance & Ops"],
-  ["hr", "Finance & Ops"],
+  ["operations", "Operations"],
+  ["administration", "Operations"],
+  ["hr", "Operations"],
+  ["communications", "Communications"],
+  ["design", "Communications"],
+  ["legal", "Legal & Admin"],
+  ["finance", "Legal & Admin"],
+  ["publishing", "Communications"],
 ];
 
 function getDepartmentLabel(dept: string): string {

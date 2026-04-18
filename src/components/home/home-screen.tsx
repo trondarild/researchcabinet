@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAppStore } from "@/stores/app-store";
 import { useTreeStore } from "@/stores/tree-store";
-import { Users, Download, Loader2 } from "lucide-react";
+import { Users, Download, Loader2, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { flattenTree } from "@/lib/tree-utils";
 import { createConversation } from "@/lib/agents/conversation-client";
@@ -358,7 +358,7 @@ export function HomeScreen() {
   const displayName = userName || "there";
 
   return (
-    <div className="flex-1 flex flex-col items-center px-4 overflow-hidden">
+    <div className="flex-1 flex flex-col items-center px-4 overflow-hidden relative">
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-xl space-y-8">
         <h1 className="text-3xl md:text-4xl font-semibold text-center text-foreground tracking-tight">
           {greeting}, {displayName}.<br />
@@ -433,6 +433,17 @@ export function HomeScreen() {
         onImportStart={() => setImporting(true)}
         onImportEnd={() => setImporting(false)}
       />
+
+      {/* Built-on notice */}
+      <a
+        href="https://runcabinet.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-4 left-4 z-50 flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        built on runcabinet
+        <ExternalLink className="size-2.5" />
+      </a>
 
       {importing && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">

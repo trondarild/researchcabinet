@@ -1,7 +1,7 @@
 schemaVersion: 1
-id: apple-root
-name: Apple
+id: cogphi-root
+name: cogphi
 kind: root
 version: 0.1.0
-description: Fun
+description: We work on predictive processing
 entry: index.md
