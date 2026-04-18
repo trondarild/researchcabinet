@@ -17,11 +17,7 @@
 
 ## From zero to AI research team in 2 minutes
 
-```bash
-npx create-cabinet@latest
-cd cabinet
-npm run dev:all
-```
+Clone the repository and start the service.
 
 Open [http://localhost:3000](http://localhost:3000). The onboarding wizard builds your custom AI research team in a few questions.
 
